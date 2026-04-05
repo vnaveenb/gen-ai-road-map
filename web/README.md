@@ -39,7 +39,7 @@ Then open `http://localhost:8088`.
 
 ### Workflows
 - [.github/workflows/web-ci.yml](../.github/workflows/web-ci.yml): builds app on PR/push.
-- [.github/workflows/web-docker-publish.yml](../.github/workflows/web-docker-publish.yml): builds and pushes image to GHCR on `main`.
+- [.github/workflows/web-docker-publish.yml](../.github/workflows/web-docker-publish.yml): builds and pushes image to GHCR on push to `main` or `master`.
 
 ### Published image
 
@@ -50,6 +50,23 @@ ghcr.io/<github-owner-lowercase>/genai-roadmap-web:latest
 ```
 
 It also publishes commit SHA tags (`sha-...`).
+
+### Where the image appears in GitHub
+
+GHCR images show up in **Packages**, not in repository files.
+
+Use one of these package pages:
+
+- User-owned repo: `https://github.com/users/<owner-lowercase>/packages/container/genai-roadmap-web`
+- Org-owned repo: `https://github.com/orgs/<org-lowercase>/packages/container/genai-roadmap-web`
+
+### If workflow ran but no image is visible
+
+1. Open Actions and confirm **web-docker-publish** succeeded (not only **web-ci**).
+2. In repository Settings > Actions > General, set Workflow permissions to **Read and write permissions**.
+3. Open the web-docker-publish run summary and copy the exact pushed tag (`latest` or `sha-...`).
+4. In Portainer registry credentials for `ghcr.io`, use GitHub username + PAT with `read:packages`.
+5. If package is private, keep credentials in Portainer; if public, unauthenticated pull can work.
 
 ### Optional secret for auto-redeploy
 
