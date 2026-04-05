@@ -1,0 +1,33 @@
+explainer:
+  required:
+    - id
+    - title
+    - competency
+    - difficulty
+    - status
+    - version
+    - created
+    - updated
+    - estimated_read_time_minutes
+    - prerequisites
+    - interview_links
+    - tags
+interview:
+  required:
+    - id
+    - title
+    - competency
+    - difficulty
+    - status
+    - version
+    - created
+    - updated
+    - linked_explainers
+    - question_count
+    - tags
+quality_gates:
+  - technical_accuracy
+  - practical_lab_presence
+  - interview_relevance
+  - references_present
+  - cross_links_valid

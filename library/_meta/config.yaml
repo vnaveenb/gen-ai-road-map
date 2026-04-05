@@ -1,0 +1,24 @@
+schema_version: 1.0
+last_updated: 2026-04-05
+roadmap_source: ../notes.md
+authoring_mode: markdown-first
+default_language: en
+tracks:
+  - explainers
+  - interviews
+competencies:
+  - id: C1
+    name: Python and DSA for AI Systems
+  - id: C2
+    name: ML and DL Fundamentals
+  - id: C3
+    name: Transformers and LLM Internals
+  - id: C4
+    name: Adaptation and Retrieval
+  - id: C5
+    name: Agents, Evals, and Guardrails
+  - id: C6
+    name: Production GenAI Engineering
+status:
+  phase: phase-a
+  description: MVP core explainer and interview pack in progress
