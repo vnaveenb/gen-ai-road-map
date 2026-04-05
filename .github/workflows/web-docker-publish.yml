@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - master
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 permissions:
@@ -35,6 +37,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Read version from package.json
+        id: pkg
+        shell: bash
+        run: echo "version=$(jq -r .version web/package.json)" >> "$GITHUB_OUTPUT"
+
       - name: Generate Docker metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -43,9 +50,13 @@ jobs:
           tags: |
             type=raw,value=latest
             type=sha,prefix=sha-
+            type=raw,value=${{ steps.pkg.outputs.version }}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.title=genai-roadmap-web
+            org.opencontainers.image.version=${{ steps.pkg.outputs.version }}
 
       - name: Build and push image
         uses: docker/build-push-action@v6

@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   genai-roadmap-web:
-    image: ${GHCR_IMAGE:-ghcr.io/your-github-username/genai-roadmap-web}:${IMAGE_TAG:-latest}
+    image: ghcr.io/vnaveenb/genai-roadmap-web:${IMAGE_TAG:-latest}
     container_name: genai-roadmap-web
     restart: unless-stopped
     ports:
