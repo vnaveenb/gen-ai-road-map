@@ -1,0 +1,82 @@
+---
+import AppLayout from "../../layouts/AppLayout.astro";
+import { getCompetencySummary, getCompetencySummaries, routeForDoc } from "../../lib/content";
+
+export function getStaticPaths() {
+	return getCompetencySummaries().map((summary) => ({
+		params: { id: summary.id.toLowerCase() }
+	}));
+}
+
+const { id } = Astro.params;
+const summary = getCompetencySummary(id ?? "");
+
+if (!summary) {
+	return Astro.redirect("/");
+}
+
+const explainers = summary.docs.filter((doc) => doc.type === "explainer");
+const interviews = summary.docs.filter((doc) => doc.type === "interview");
+---
+
+<AppLayout
+	title={`${summary.id} · ${summary.name}`}
+	description={`Explore ${summary.id} explainers and interview packs.`}
+>
+	<section class="hero">
+		<span class="kicker">{summary.id}</span>
+		<h1>{summary.name}</h1>
+		<p>
+			{summary.explainerCount} explainers and {summary.interviewCount} interview packs. Track your reading and drill
+			this module end-to-end before moving ahead.
+		</p>
+		<div class="meta-row">
+			<span class="pill pill-accent">{summary.totalReadMinutes} min reading</span>
+			<span class="pill">{summary.totalQuestions} interview questions</span>
+		</div>
+	</section>
+
+	<section class="section-block">
+		<div class="section-head">
+			<h2>Explainers</h2>
+			<p>Concept-first deep dives with practical implementation context.</p>
+		</div>
+		<div class="grid-cards">
+			{explainers.map((doc) => (
+				<article class="card">
+					<h3>{doc.title}</h3>
+					<p>{doc.excerpt || "Open this explainer for details."}</p>
+					<div class="meta-row">
+						<span class="pill pill-accent">{doc.difficulty}</span>
+						{doc.readTimeMinutes ? <span class="pill">{doc.readTimeMinutes} min</span> : null}
+					</div>
+					<p>
+						<a href={routeForDoc(doc)}>Read explainer</a>
+					</p>
+				</article>
+			))}
+		</div>
+	</section>
+
+	<section class="section-block">
+		<div class="section-head">
+			<h2>Interview Packs</h2>
+			<p>Question banks with layered answers and follow-up ladders.</p>
+		</div>
+		<div class="grid-cards">
+			{interviews.map((doc) => (
+				<article class="card">
+					<h3>{doc.title}</h3>
+					<p>{doc.excerpt || "Open this interview pack for practice."}</p>
+					<div class="meta-row">
+						<span class="pill pill-accent">{doc.difficulty}</span>
+						{doc.questionCount ? <span class="pill">{doc.questionCount} questions</span> : null}
+					</div>
+					<p>
+						<a href={routeForDoc(doc)}>Practice now</a>
+					</p>
+				</article>
+			))}
+		</div>
+	</section>
+</AppLayout>

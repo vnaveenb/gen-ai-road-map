@@ -1,0 +1,93 @@
+---
+import AppLayout from "../../layouts/AppLayout.astro";
+import { getDocBySlug, getDocsByType, getRelatedDocs, routeForDoc } from "../../lib/content";
+import { renderMarkdown } from "../../lib/markdown";
+
+export function getStaticPaths() {
+	return getDocsByType("explainer").map((doc) => ({
+		params: { slug: doc.slug }
+	}));
+}
+
+const { slug } = Astro.params;
+const doc = getDocBySlug("explainer", slug ?? "");
+
+if (!doc) {
+	throw new Error("Explainer not found.");
+}
+
+const tocEntries = doc.headings.filter((heading) => heading.level === 2 || heading.level === 3);
+const relatedDocs = getRelatedDocs(doc);
+const html = renderMarkdown(doc.content, doc.sourcePath);
+---
+
+<AppLayout title={doc.title} description={doc.excerpt || doc.title}>
+	<section class="section-block">
+		<div class="doc-panel doc-heading">
+			<span class="kicker">{doc.competency} · Explainer</span>
+			<h1>{doc.title}</h1>
+			<p>{doc.excerpt || "Deep technical explainer from your library."}</p>
+			<div class="meta-row">
+				<span class="pill pill-accent">{doc.difficulty}</span>
+				{doc.readTimeMinutes ? <span class="pill">{doc.readTimeMinutes} min read</span> : null}
+				<span class="pill">v{doc.version}</span>
+			</div>
+			<div class="reader-actions" data-reader-actions data-doc-key={`explainer:${doc.slug}`}>
+				<button class="reader-btn" type="button" data-toggle-read aria-pressed="false">Mark read</button>
+				<button class="reader-btn" type="button" data-toggle-bookmark aria-pressed="false">Bookmark</button>
+				<span class="reader-hint" data-reader-status>Not tracked yet</span>
+			</div>
+		</div>
+	</section>
+
+	<section class="section-block doc-wrapper">
+		<aside class="doc-panel toc-panel">
+			<h3>On This Page</h3>
+			<ul class="toc-list">
+				{tocEntries.map((heading) => (
+					<li class={heading.level === 3 ? "toc-level-3" : ""}>
+						<a href={`#${heading.slug}`}>{heading.text}</a>
+					</li>
+				))}
+			</ul>
+		</aside>
+
+		<article class="doc-panel">
+			<details class="toc-mobile">
+				<summary>Jump to section</summary>
+				<ul class="toc-list">
+					{tocEntries.map((heading) => (
+						<li class={heading.level === 3 ? "toc-level-3" : ""}>
+							<a href={`#${heading.slug}`}>{heading.text}</a>
+						</li>
+					))}
+				</ul>
+			</details>
+			<div class="markdown" set:html={html} />
+		</article>
+	</section>
+
+	{relatedDocs.length ? (
+		<section class="section-block">
+			<div class="section-head">
+				<h2>Related Modules</h2>
+				<p>Continue in connected interview and explainer tracks.</p>
+			</div>
+			<div class="related-list">
+				{relatedDocs.map((relatedDoc) => (
+					<article class="card">
+						<h3>{relatedDoc.title}</h3>
+						<p>{relatedDoc.excerpt || "Open this next for reinforcement."}</p>
+						<div class="meta-row">
+							<span class="pill pill-accent">{relatedDoc.competency}</span>
+							<span class="pill">{relatedDoc.type}</span>
+						</div>
+						<p>
+							<a href={routeForDoc(relatedDoc)}>Open related module</a>
+						</p>
+					</article>
+				))}
+			</div>
+		</section>
+	) : null}
+</AppLayout>

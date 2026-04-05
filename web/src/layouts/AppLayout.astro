@@ -1,0 +1,171 @@
+---
+import "../styles/global.css";
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = "GenAI Roadmap Library",
+	description = "Mobile-ready learning companion built from your GenAI library."
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="description" content={description} />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<link rel="icon" href="/favicon.ico" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+	</head>
+	<body>
+		<header class="site-header">
+			<div class="nav-shell">
+				<a class="brand" href="/">
+					<span>GenAI Roadmap</span>
+					<span class="brand-badge">On the Go</span>
+				</a>
+				<nav class="desktop-nav" aria-label="Primary navigation">
+					<a href="/">Home</a>
+					<a href="/roadmap">Roadmap</a>
+					<a href="/competencies/c1">C1</a>
+					<a href="/competencies/c2">C2</a>
+					<a href="/competencies/c3">C3</a>
+					<a href="/competencies/c4">C4</a>
+					<a href="/competencies/c5">C5</a>
+					<a href="/competencies/c6">C6</a>
+				</nav>
+				<details class="mobile-nav">
+					<summary>Menu</summary>
+					<nav class="mobile-links" aria-label="Mobile navigation">
+						<a href="/">Home</a>
+						<a href="/roadmap">Roadmap</a>
+						<a href="/competencies/c1">C1: Python and DSA</a>
+						<a href="/competencies/c2">C2: ML Foundations</a>
+						<a href="/competencies/c3">C3: Transformers</a>
+						<a href="/competencies/c4">C4: Adaptation and RAG</a>
+						<a href="/competencies/c5">C5: Agents and Evals</a>
+						<a href="/competencies/c6">C6: Production Engineering</a>
+					</nav>
+				</details>
+			</div>
+		</header>
+
+		<main class="page-shell">
+			<slot />
+		</main>
+
+		<footer class="site-footer">
+			Built from your markdown library for fast mobile reading and interview prep.
+		</footer>
+
+		<script is:inline>
+			const STORAGE_KEY = "genai-roadmap-state-v1";
+
+			const safeParse = (raw) => {
+				try {
+					return JSON.parse(raw || "{}");
+				} catch {
+					return {};
+				}
+			};
+
+			const readState = safeParse(localStorage.getItem(STORAGE_KEY));
+			const saveState = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(readState));
+
+			const panels = document.querySelectorAll("[data-reader-actions]");
+			for (const panel of panels) {
+				const key = panel.getAttribute("data-doc-key");
+				if (!key) {
+					continue;
+				}
+
+				if (!readState[key]) {
+					readState[key] = { read: false, bookmarked: false };
+				}
+
+				const readButton = panel.querySelector("[data-toggle-read]");
+				const bookmarkButton = panel.querySelector("[data-toggle-bookmark]");
+				const statusNode = panel.querySelector("[data-reader-status]");
+
+				const syncUI = () => {
+					const state = readState[key];
+					if (readButton) {
+						readButton.classList.toggle("is-active", state.read);
+						readButton.setAttribute("aria-pressed", String(state.read));
+						readButton.textContent = state.read ? "Read" : "Mark read";
+					}
+
+					if (bookmarkButton) {
+						bookmarkButton.classList.toggle("is-active", state.bookmarked);
+						bookmarkButton.setAttribute("aria-pressed", String(state.bookmarked));
+						bookmarkButton.textContent = state.bookmarked ? "Bookmarked" : "Bookmark";
+					}
+
+					if (statusNode) {
+						if (state.read && state.bookmarked) {
+							statusNode.textContent = "Saved as read and bookmarked";
+						} else if (state.read) {
+							statusNode.textContent = "Marked as read";
+						} else if (state.bookmarked) {
+							statusNode.textContent = "Saved in bookmarks";
+						} else {
+							statusNode.textContent = "Not tracked yet";
+						}
+					}
+				};
+
+				readButton?.addEventListener("click", () => {
+					readState[key].read = !readState[key].read;
+					saveState();
+					syncUI();
+				});
+
+				bookmarkButton?.addEventListener("click", () => {
+					readState[key].bookmarked = !readState[key].bookmarked;
+					saveState();
+					syncUI();
+				});
+
+				syncUI();
+			}
+		</script>
+
+		<script type="module" is:inline>
+			const mermaidBlocks = document.querySelectorAll("pre code.language-mermaid");
+			if (mermaidBlocks.length) {
+				const { default: mermaid } = await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs");
+				mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+				for (const block of mermaidBlocks) {
+					const source = block.textContent ?? "";
+					const wrapper = document.createElement("div");
+					wrapper.className = "mermaid";
+					wrapper.textContent = source;
+					const pre = block.closest("pre");
+					if (pre?.parentNode) {
+						pre.parentNode.replaceChild(wrapper, pre);
+						await mermaid.run({ nodes: [wrapper], suppressErrors: true });
+					}
+				}
+			}
+		</script>
+		<script is:inline defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+		<script
+			is:inline
+			defer
+			src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+			onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"
+		></script>
+	</body>
+</html>

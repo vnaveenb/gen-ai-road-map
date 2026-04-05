@@ -1,0 +1,87 @@
+---
+import AppLayout from "../layouts/AppLayout.astro";
+import { getAllDocs, getCompetencySummaries, routeForDoc } from "../lib/content";
+
+const competencies = getCompetencySummaries();
+const docs = getAllDocs();
+
+const recentDocs = [...docs]
+	.sort((a, b) => {
+		const aDate = a.updated || a.created;
+		const bDate = b.updated || b.created;
+		return bDate.localeCompare(aDate);
+	})
+	.slice(0, 9);
+
+const totalReadMinutes = competencies.reduce((sum, entry) => sum + entry.totalReadMinutes, 0);
+const totalQuestionCount = competencies.reduce((sum, entry) => sum + entry.totalQuestions, 0);
+---
+
+<AppLayout
+	title="GenAI Roadmap Library"
+	description="Responsive learning app for your GenAI roadmap, explainers, and interview packs."
+>
+	<section class="hero">
+		<span class="kicker">Mobile-first study companion</span>
+		<h1>Learn your GenAI roadmap anywhere, with structure and momentum.</h1>
+		<p>
+			Your complete C1 to C6 library is now app-ready with competency hubs, long-form explainers, and deep
+			interview packs optimized for on-the-go study.
+		</p>
+		<div class="quick-actions">
+			<a class="action action-primary" href="/roadmap">Open Roadmap</a>
+			<a class="action action-secondary" href="/competencies/c1">Start with C1</a>
+		</div>
+	</section>
+
+	<section class="section-block">
+		<div class="section-head">
+			<h2>Program Snapshot</h2>
+			<p>
+				{docs.length} total docs · {Math.round(totalReadMinutes / 60)}h read time · {totalQuestionCount}
+				interview prompts
+			</p>
+		</div>
+		<div class="grid-cards">
+			{competencies.map((entry) => (
+				<article class="card">
+					<h3>{entry.id}: {entry.name}</h3>
+					<p>
+						{entry.explainerCount} explainers · {entry.interviewCount} interview packs
+					</p>
+					<div class="meta-row">
+						<span class="pill pill-accent">{entry.totalReadMinutes} min reading</span>
+						<span class="pill">{entry.totalQuestions} questions</span>
+					</div>
+					<p>
+						<a href={`/competencies/${entry.id.toLowerCase()}`}>Open competency hub</a>
+					</p>
+				</article>
+			))}
+		</div>
+	</section>
+
+	<section class="section-block">
+		<div class="section-head">
+			<h2>Recently Updated Content</h2>
+			<p>Jump directly to high-impact modules.</p>
+		</div>
+		<div class="grid-cards">
+			{recentDocs.map((doc) => (
+				<article class="card">
+					<h3>{doc.title}</h3>
+					<p>{doc.excerpt || "Open this module for a deeper walkthrough."}</p>
+					<div class="meta-row">
+						<span class="pill pill-accent">{doc.competency}</span>
+						<span class="pill">{doc.type}</span>
+						{doc.readTimeMinutes ? <span class="pill">{doc.readTimeMinutes} min</span> : null}
+						{doc.questionCount ? <span class="pill">{doc.questionCount} questions</span> : null}
+					</div>
+					<p>
+						<a href={routeForDoc(doc)}>Open now</a>
+					</p>
+				</article>
+			))}
+		</div>
+	</section>
+</AppLayout>

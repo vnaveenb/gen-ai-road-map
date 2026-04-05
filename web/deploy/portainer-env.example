@@ -1,0 +1,4 @@
+# Copy values into Portainer stack environment variables.
+GHCR_IMAGE=ghcr.io/your-github-username/genai-roadmap-web
+IMAGE_TAG=latest
+APP_PORT=8088
