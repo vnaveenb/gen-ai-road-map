@@ -17,8 +17,14 @@ tags: []
 ## Scope
 
 ## Interviewer Probe Map
-- What they are checking:
-- What weak answers look like:
+
+## Answer Format Standard
+For every question, keep this exact order:
+1. Direct answer (2 to 4 lines).
+2. Deep answer (step-by-step reasoning).
+3. Common mistakes and red flags.
+4. Follow-up variants.
+5. Sample code or pseudocode (when relevant).
 
 ## Core Questions
 
@@ -27,9 +33,15 @@ Question:
 
 What interviewer is probing:
 
-Strong answer framework:
+Direct answer (2 to 4 lines):
+
+Deep answer:
+
+Common mistakes and red flags:
 
 Common mistakes:
+
+Sample code or pseudocode (when relevant):
 
 Follow-up variants:
 

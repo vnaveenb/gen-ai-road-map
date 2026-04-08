@@ -13,7 +13,7 @@ const { slug } = Astro.params;
 const doc = getDocBySlug("explainer", slug ?? "");
 
 if (!doc) {
-	throw new Error("Explainer not found.");
+	return Astro.redirect("/roadmap");
 }
 
 const tocEntries = doc.headings.filter((heading) => heading.level === 2 || heading.level === 3);

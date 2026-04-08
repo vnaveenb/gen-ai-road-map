@@ -353,6 +353,50 @@ a:hover {
 	font-weight: 700;
 }
 
+.question-jump {
+	margin-top: 0.95rem;
+	padding-top: 0.85rem;
+	border-top: 1px solid var(--line);
+}
+
+.question-jump h3 {
+	margin: 0 0 0.5rem;
+	font-size: 0.86rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--ink-soft);
+}
+
+.question-jump-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.28rem;
+	max-height: 15.5rem;
+	overflow-y: auto;
+	font-size: 0.86rem;
+}
+
+.question-jump-list a {
+	display: block;
+	text-decoration: none;
+	padding: 0.22rem 0.35rem;
+	border-radius: 0.45rem;
+	color: var(--ink-soft);
+}
+
+.question-jump-list a:hover,
+.question-jump-list a:focus-visible {
+	background: rgba(0, 122, 104, 0.12);
+	color: var(--accent-strong);
+}
+
+.question-jump-mobile {
+	margin-bottom: 0.75rem;
+}
+
 .doc-heading h1 {
 	margin: 0.2rem 0 0.4rem;
 	font-family: "IBM Plex Serif", "Georgia", serif;
@@ -429,6 +473,73 @@ a:hover {
 .markdown li {
 	font-size: 1rem;
 	color: var(--ink);
+}
+
+.markdown .answer-block {
+	display: block;
+	border-left: 4px solid var(--line);
+	border-radius: 0.6rem;
+	padding: 0.55rem 0.7rem;
+	margin: 0.78rem 0;
+	background: rgba(31, 45, 42, 0.05);
+}
+
+.markdown .answer-label {
+	font-size: 0.72rem;
+	font-weight: 800;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	margin-right: 0.45rem;
+}
+
+.markdown .answer-body {
+	font-size: 0.97rem;
+	color: var(--ink);
+}
+
+.markdown .answer-direct {
+	border-color: rgba(0, 122, 104, 0.58);
+	background: rgba(0, 122, 104, 0.12);
+}
+
+.markdown .answer-direct .answer-label {
+	color: var(--accent-strong);
+}
+
+.markdown .answer-deep {
+	border-color: rgba(52, 86, 122, 0.6);
+	background: rgba(52, 86, 122, 0.12);
+}
+
+.markdown .answer-deep .answer-label {
+	color: #2f4f70;
+}
+
+.markdown .answer-risk {
+	border-color: rgba(240, 91, 60, 0.58);
+	background: rgba(240, 91, 60, 0.13);
+}
+
+.markdown .answer-risk .answer-label {
+	color: #b9462f;
+}
+
+.markdown .answer-followup {
+	border-color: rgba(122, 107, 57, 0.6);
+	background: rgba(122, 107, 57, 0.13);
+}
+
+.markdown .answer-followup .answer-label {
+	color: #6d5f32;
+}
+
+.markdown .answer-code {
+	border-color: rgba(56, 85, 99, 0.6);
+	background: rgba(56, 85, 99, 0.12);
+}
+
+.markdown .answer-code .answer-label {
+	color: #325164;
 }
 
 .markdown ul,

@@ -130,21 +130,176 @@ Validate graph before execution, include cycle path in error output, and prevent
 What interviewer is probing:
 - Single-flight and idempotency control.
 
+Direct answer:
+Use a single-flight registry keyed by normalized request identity so only one worker computes the result while duplicates await the same future.
+
+Deep answer:
+1. Define idempotency key from user, operation, and normalized payload.
+2. Store an in-flight promise/future in a bounded map with TTL.
+3. First request executes work; followers await the same result.
+4. On completion, publish result and evict in-flight key.
+5. For distributed services, combine Redis lock plus short-lived result cache.
+
+Common mistakes and red flags:
+- Dedup key includes timestamps, causing near-zero dedup hit rate.
+- No timeout/cleanup path for stuck in-flight entries.
+- Sharing failures forever instead of limiting failure caching.
+
+Follow-up variants:
+- How do you prevent map growth from high-cardinality keys?
+- When do you dedupe only writes vs dedupe all operations?
+
+Sample code or pseudocode (when relevant):
+```python
+key = make_idempotency_key(req)
+future = inflight.get(key)
+if future is None:
+  future = loop.create_future()
+  inflight[key] = future
+  try:
+    future.set_result(await handle(req))
+  except Exception as exc:
+    future.set_exception(exc)
+  finally:
+    inflight.pop(key, None)
+return await future
+```
+
 ### Q7: Parse unreliable model JSON safely
 What interviewer is probing:
 - Typed contracts and safe fallback behavior.
+
+Direct answer:
+Validate model output against a strict schema, attempt bounded repair once, and fall back to safe defaults or refusal if contract checks still fail.
+
+Deep answer:
+1. Require a typed schema (for example, Pydantic model or JSON Schema).
+2. Parse raw output with strict mode first.
+3. If parse fails, run one deterministic repair pass (trim wrappers, fix quotes, remove trailing commas).
+4. Revalidate and reject on second failure.
+5. Log parse category metrics for prompt/model tuning.
+
+Common mistakes and red flags:
+- Accepting partially parsed objects silently.
+- Mixing parser repair and business defaults in one step.
+- Returning malformed data with HTTP 200 status.
+
+Follow-up variants:
+- How do you version schemas without breaking clients?
+- How do you detect schema drift after model upgrades?
+
+Sample code or pseudocode (when relevant):
+```python
+def parse_or_fail(raw: str) -> OutputModel:
+  try:
+    return OutputModel.model_validate_json(raw)
+  except Exception:
+    repaired = deterministic_repair(raw)
+    return OutputModel.model_validate_json(repaired)
+```
 
 ### Q8: Sliding-window max for real-time latency dashboard
 What interviewer is probing:
 - Monotonic queue usage and bounded memory.
 
+Direct answer:
+Use a monotonic deque of candidate maxima and evict expired indices as the window advances for O(1) amortized updates.
+
+Deep answer:
+1. Store pairs of (timestamp/index, value) in descending value order.
+2. Before insert, pop from tail while tail value <= new value.
+3. Push current item.
+4. Evict head while it is outside the sliding window.
+5. Head always equals current max.
+
+Common mistakes and red flags:
+- Recomputing max over full window each update (O(window)).
+- Forgetting expiry checks before reading max.
+- Using unordered containers that cannot preserve recency.
+
+Follow-up variants:
+- How does this change for time-based vs count-based windows?
+- How would you shard this for high-cardinality metrics?
+
+Sample code or pseudocode (when relevant):
+```python
+while dq and dq[-1].value <= value:
+  dq.pop()
+dq.append(Node(idx, value))
+while dq and dq[0].idx <= idx - window:
+  dq.popleft()
+current_max = dq[0].value
+```
+
 ### Q9: K-way merge for retrieval results
 What interviewer is probing:
 - Heap-driven merge and ranking stability.
 
+Direct answer:
+Maintain a heap with one cursor per ranked list and pop the best next candidate each step, applying stable tie-breakers and dedup by document id.
+
+Deep answer:
+1. Ensure each source list is sorted by score.
+2. Push first element from each list to a heap.
+3. Pop best item, append if unseen document id.
+4. Advance cursor for that list and push next candidate.
+5. Stop at requested top-k and track source contribution mix.
+
+Common mistakes and red flags:
+- Ignoring duplicate doc ids from multiple retrievers.
+- No deterministic tie-break (unstable ranking between runs).
+- Mixing incomparable score scales without normalization.
+
+Follow-up variants:
+- How do you blend BM25 and dense scores safely?
+- How do you cap one source from dominating top-k?
+
+Sample code or pseudocode (when relevant):
+```python
+heap = init_with_first_item_each_list(lists)
+seen = set()
+while heap and len(out) < k:
+  item = heappop(heap)  # best score first
+  if item.doc_id not in seen:
+    out.append(item)
+    seen.add(item.doc_id)
+  push_next_from_same_list(item.list_id, item.next_idx)
+```
+
 ### Q10: Retry policy design by exception taxonomy
 What interviewer is probing:
 - Reliability-aware Python error handling.
+
+Direct answer:
+Retry only transient failures with exponential backoff plus jitter, enforce retry budgets/deadlines, and never retry non-idempotent operations without idempotency keys.
+
+Deep answer:
+1. Classify exceptions: transient, throttling, permanent, and programmer errors.
+2. Define per-class max attempts and backoff policy.
+3. Attach retry budget to request deadline.
+4. Emit retry metrics by exception class.
+5. Add circuit breaker to prevent retry storms.
+
+Common mistakes and red flags:
+- Retrying validation errors or auth failures.
+- Unbounded retries without jitter.
+- Retrying writes without idempotency protection.
+
+Follow-up variants:
+- How do you tune retry policy under partner API rate limits?
+- When do you fail fast instead of retrying?
+
+Sample code or pseudocode (when relevant):
+```python
+for attempt in range(max_attempts):
+  try:
+    return await call()
+  except TransientError:
+    await asyncio.sleep(backoff_with_jitter(attempt))
+  except PermanentError:
+    raise
+raise RetryExhausted()
+```
 
 ## Systems and Scale
 

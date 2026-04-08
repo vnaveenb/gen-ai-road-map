@@ -10,6 +10,8 @@ const {
 	title = "GenAI Roadmap Library",
 	description = "Mobile-ready learning companion built from your GenAI library."
 } = Astro.props;
+
+const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined;
 ---
 
 <!doctype html>
@@ -19,6 +21,10 @@ const {
 		<meta name="viewport" content="width=device-width" />
 		<meta name="description" content={description} />
 		<meta name="generator" content={Astro.generator} />
+		{canonicalUrl ? <link rel="canonical" href={canonicalUrl} /> : null}
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		{canonicalUrl ? <meta property="og:url" content={canonicalUrl} /> : null}
 		<title>{title}</title>
 		<link rel="icon" href="/favicon.ico" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -74,6 +80,19 @@ const {
 
 		<script is:inline>
 			const STORAGE_KEY = "genai-roadmap-state-v1";
+			const ANSWER_LABELS = [
+				{ label: "Direct answer:", className: "answer-direct" },
+				{ label: "Short answer:", className: "answer-direct" },
+				{ label: "Deep answer:", className: "answer-deep" },
+				{ label: "Common mistakes and red flags:", className: "answer-risk" },
+				{ label: "Common mistakes:", className: "answer-risk" },
+				{ label: "Anti-pattern answer:", className: "answer-risk" },
+				{ label: "Follow-up variants:", className: "answer-followup" },
+				{ label: "Follow-up ladder:", className: "answer-followup" },
+				{ label: "Sample code or pseudocode (when relevant):", className: "answer-code" },
+				{ label: "Sample code or pseudocode:", className: "answer-code" },
+				{ label: "Sample code:", className: "answer-code" }
+			];
 
 			const safeParse = (raw) => {
 				try {
@@ -141,6 +160,42 @@ const {
 				});
 
 				syncUI();
+			}
+
+			const interviewParagraphs = document.querySelectorAll("[data-doc-type='interview'] .markdown p");
+			for (const paragraph of interviewParagraphs) {
+				if (paragraph.children.length > 0) {
+					continue;
+				}
+
+				const rawText = (paragraph.textContent || "").trim();
+				if (!rawText) {
+					continue;
+				}
+
+				const labelMatch = ANSWER_LABELS.find((entry) =>
+					rawText.toLowerCase().startsWith(entry.label.toLowerCase())
+				);
+				if (!labelMatch) {
+					continue;
+				}
+
+				const answerBody = rawText.slice(labelMatch.label.length).trim();
+				paragraph.classList.add("answer-block", labelMatch.className);
+				paragraph.textContent = "";
+
+				const labelNode = document.createElement("span");
+				labelNode.className = "answer-label";
+				labelNode.textContent = labelMatch.label;
+				paragraph.append(labelNode);
+
+				if (answerBody) {
+					const spacer = document.createTextNode(" ");
+					const bodyNode = document.createElement("span");
+					bodyNode.className = "answer-body";
+					bodyNode.textContent = answerBody;
+					paragraph.append(spacer, bodyNode);
+				}
 			}
 		</script>
 

@@ -13,10 +13,11 @@ const { slug } = Astro.params;
 const doc = getDocBySlug("interview", slug ?? "");
 
 if (!doc) {
-	throw new Error("Interview pack not found.");
+	return Astro.redirect("/roadmap");
 }
 
 const tocEntries = doc.headings.filter((heading) => heading.level === 2 || heading.level === 3);
+const questionEntries = doc.headings.filter((heading) => heading.level === 3 && /^Q\d+/i.test(heading.text));
 const relatedDocs = getRelatedDocs(doc);
 const html = renderMarkdown(doc.content, doc.sourcePath);
 ---
@@ -50,9 +51,21 @@ const html = renderMarkdown(doc.content, doc.sourcePath);
 					</li>
 				))}
 			</ul>
+			{questionEntries.length ? (
+				<div class="question-jump" aria-label="Question quick jump">
+					<h3>Question Jump</h3>
+					<ul class="question-jump-list">
+						{questionEntries.map((heading) => (
+							<li>
+								<a href={`#${heading.slug}`}>{heading.text}</a>
+							</li>
+						))}
+					</ul>
+				</div>
+			) : null}
 		</aside>
 
-		<article class="doc-panel">
+		<article class="doc-panel" data-doc-type="interview">
 			<details class="toc-mobile">
 				<summary>Jump to section</summary>
 				<ul class="toc-list">
@@ -63,6 +76,18 @@ const html = renderMarkdown(doc.content, doc.sourcePath);
 					))}
 				</ul>
 			</details>
+			{questionEntries.length ? (
+				<details class="toc-mobile question-jump-mobile">
+					<summary>Jump to question</summary>
+					<ul class="question-jump-list">
+						{questionEntries.map((heading) => (
+							<li>
+								<a href={`#${heading.slug}`}>{heading.text}</a>
+							</li>
+						))}
+					</ul>
+				</details>
+			) : null}
 			<div class="markdown" set:html={html} />
 		</article>
 	</section>
