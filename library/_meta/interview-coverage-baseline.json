@@ -1,0 +1,9 @@
+{
+  "minimumCoveragePercent": {
+    "direct": 100,
+    "deep": 100,
+    "mistakes": 100,
+    "followUp": 100,
+    "code": 100
+  }
+}

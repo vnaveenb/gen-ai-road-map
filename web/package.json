@@ -9,7 +9,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "interview:coverage": "node ../library/_tools/interview-coverage-check.mjs",
+    "interview:coverage:strict": "node ../library/_tools/interview-coverage-check.mjs --enforce-baseline"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.6.0",

@@ -1,0 +1,94 @@
+{
+  "generatedAt": "2026-04-08T17:46:43.175Z",
+  "totals": {
+    "counts": {
+      "questions": 178,
+      "direct": 178,
+      "deep": 178,
+      "mistakes": 178,
+      "followUp": 178,
+      "code": 178
+    },
+    "percent": {
+      "direct": 100,
+      "deep": 100,
+      "mistakes": 100,
+      "followUp": 100,
+      "code": 100
+    }
+  },
+  "files": [
+    {
+      "file": "library/core/adaptation-retrieval/interviews/peft-and-rag-questions.md",
+      "counts": {
+        "total": 28,
+        "direct": 28,
+        "deep": 28,
+        "mistakes": 28,
+        "followUp": 28,
+        "code": 28
+      },
+      "missingCount": 0
+    },
+    {
+      "file": "library/core/agents-evals-guardrails/interviews/agents-evals-and-safety-questions.md",
+      "counts": {
+        "total": 30,
+        "direct": 30,
+        "deep": 30,
+        "mistakes": 30,
+        "followUp": 30,
+        "code": 30
+      },
+      "missingCount": 0
+    },
+    {
+      "file": "library/core/ml-foundations/interviews/ml-dl-fundamentals-questions.md",
+      "counts": {
+        "total": 28,
+        "direct": 28,
+        "deep": 28,
+        "mistakes": 28,
+        "followUp": 28,
+        "code": 28
+      },
+      "missingCount": 0
+    },
+    {
+      "file": "library/core/production-engineering/interviews/llm-production-and-system-design-questions.md",
+      "counts": {
+        "total": 32,
+        "direct": 32,
+        "deep": 32,
+        "mistakes": 32,
+        "followUp": 32,
+        "code": 32
+      },
+      "missingCount": 0
+    },
+    {
+      "file": "library/core/python-dsa/interviews/python-and-dsa-ai-systems-questions.md",
+      "counts": {
+        "total": 30,
+        "direct": 30,
+        "deep": 30,
+        "mistakes": 30,
+        "followUp": 30,
+        "code": 30
+      },
+      "missingCount": 0
+    },
+    {
+      "file": "library/core/transformers-llm/interviews/transformers-and-tokenization-questions.md",
+      "counts": {
+        "total": 30,
+        "direct": 30,
+        "deep": 30,
+        "mistakes": 30,
+        "followUp": 30,
+        "code": 30
+      },
+      "missingCount": 0
+    }
+  ]
+}
