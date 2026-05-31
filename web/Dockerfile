@@ -1,4 +1,4 @@
-FROM node:22-alpine AS deps
+FROM node:22.22.3-alpine AS deps
 WORKDIR /app
 COPY web/package*.json ./
 RUN npm ci
@@ -11,7 +11,7 @@ COPY library/ /library/
 COPY notes.md /notes.md
 RUN npm run build
 
-FROM nginx:1.27-alpine AS runner
+FROM nginx:1.27.5-alpine AS runner
 COPY web/deploy/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 
